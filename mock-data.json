@@ -1,0 +1,34 @@
+{
+  "scenarios": [
+    {
+      "name": "Startup à succès",
+      "data": {
+        "monthlyRevenue": 1500000,
+        "monthlyCosts": 450000,
+        "growthRate": 25,
+        "currency": "XOF"
+      },
+      "expectedStatus": "Excellent"
+    },
+    {
+      "name": "En danger",
+      "data": {
+        "monthlyRevenue": 800000,
+        "monthlyCosts": 950000,
+        "growthRate": -5,
+        "currency": "XOF"
+      },
+      "expectedStatus": "Critique"
+    },
+    {
+      "name": "Croissance fragile",
+      "data": {
+        "monthlyRevenue": 500000,
+        "monthlyCosts": 400000,
+        "growthRate": 2,
+        "currency": "USD"
+      },
+      "expectedStatus": "Fragile"
+    }
+  ]
+}
