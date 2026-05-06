@@ -10,146 +10,141 @@ const BusinessHealthScore: React.FC = () => {
   const { data, result, updateField, setCurrency } = useHealthScore();
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white font-sans selection:bg-teal-500/30 overflow-x-hidden">
-      {/* Background Decorative Elements */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-500/10 blur-[120px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full animate-pulse-slow" style={{ animationDelay: '1.5s' }} />
+    <div className="min-h-screen bg-[#030305] text-white selection:bg-teal-500/30 overflow-x-hidden font-sans">
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-teal-500/[0.03] blur-[150px] rounded-full glow-bg" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/[0.03] blur-[150px] rounded-full glow-bg" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header Section */}
-        <header className="mb-16 flex flex-col md:flex-row md:items-center justify-between gap-8 animate-in fade-in duration-1000">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(20,184,166,0.3)] gradient-border">
-              <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black tracking-tight uppercase">
-                  Founder <span className="text-teal-500">Copilot</span>
-                </h1>
-                <span className="px-2 py-0.5 rounded text-[10px] font-black bg-teal-500/10 text-teal-500 border border-teal-500/20 uppercase tracking-widest">v2.0</span>
+      <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row min-h-screen">
+        
+        {/* SIDEBAR: Configuration */}
+        <aside className="w-full lg:w-[400px] lg:fixed lg:h-screen p-8 border-b lg:border-b-0 lg:border-r border-white/5 bg-black/20 backdrop-blur-3xl z-10 flex flex-col">
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
+                <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
-              <p className="text-gray-500 text-xs font-medium mt-1 tracking-wide uppercase">Advanced Business Health Monitoring</p>
+              <h1 className="text-xl font-black uppercase tracking-tighter">
+                Founder <span className="text-teal-500">Copilot</span>
+              </h1>
             </div>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] opacity-60">Intelligence Business App</p>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex glass-panel p-1 rounded-xl border border-white/5">
-              {(['XOF', 'USD'] as const).map((curr) => (
-                <button
-                  key={curr}
-                  onClick={() => setCurrency(curr)}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black transition-all duration-300 tracking-widest ${
-                    data.currency === curr 
-                    ? 'bg-teal-500 text-black shadow-[0_0_15px_rgba(20,184,166,0.4)]' 
-                    : 'text-gray-500 hover:text-gray-300'
-                  }`}
-                >
-                  {curr}
-                </button>
-              ))}
-            </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-          {/* Inputs Column */}
-          <aside className="xl:col-span-4 space-y-6 animate-in slide-in-from-left duration-700">
-            <div className="glass-panel p-8 rounded-3xl gradient-border">
-              <div className="flex items-center justify-between mb-10">
-                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-teal-500/80">Config Business</h2>
-                <div className="w-8 h-1 bg-teal-500/20 rounded-full" />
+          <div className="flex-1 space-y-10">
+            <section className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-500">Paramètres</h2>
+                <div className="flex bg-white/5 p-1 rounded-lg">
+                  {(['XOF', 'USD'] as const).map((curr) => (
+                    <button
+                      key={curr}
+                      onClick={() => setCurrency(curr)}
+                      className={`px-4 py-1.5 rounded-md text-[9px] font-black transition-all tracking-widest ${
+                        data.currency === curr 
+                        ? 'bg-teal-500 text-black' 
+                        : 'text-gray-500 hover:text-white'
+                      }`}
+                    >
+                      {curr}
+                    </button>
+                  ))}
+                </div>
               </div>
-              
-              <div className="space-y-8">
+
+              <div className="space-y-6">
                 {[
-                  { id: 'monthlyRevenue', label: 'Revenu Mensuel', placeholder: 'ex: 1 500 000', suffix: data.currency },
-                  { id: 'monthlyCosts', label: 'Coûts Totaux', placeholder: 'ex: 900 000', suffix: data.currency },
-                  { id: 'growthRate', label: 'Croissance', placeholder: 'ex: 12', suffix: '%' },
+                  { id: 'monthlyRevenue', label: 'Chiffre d\'Affaires Mensuel', icon: '💰' },
+                  { id: 'monthlyCosts', label: 'Charges Totales', icon: '📉' },
+                  { id: 'growthRate', label: 'Taux de Croissance (%)', icon: '🚀' },
                 ].map((field) => (
-                  <div key={field.id} className="space-y-3">
-                    <label htmlFor={field.id} className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.15em]">
+                  <div key={field.id} className="space-y-3 group">
+                    <label htmlFor={field.id} className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest transition-colors group-focus-within:text-teal-500">
+                      <span>{field.icon}</span>
                       {field.label}
                     </label>
-                    <div className="relative group">
+                    <div className="input-field relative overflow-hidden">
                       <input
                         id={field.id}
                         type="number"
-                        placeholder={field.placeholder}
-                        className="glass-input w-full rounded-2xl py-4 px-5 font-mono text-lg text-white focus:outline-none"
+                        className="w-full bg-transparent py-4 px-5 font-mono text-xl text-white focus:outline-none placeholder:text-white/10"
+                        placeholder="0.00"
                         value={(data as any)[field.id] || ''}
                         onChange={(e) => updateField(field.id as any, e.target.value)}
                       />
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 font-mono text-sm group-focus-within:text-teal-500 transition-colors uppercase font-bold">
-                        {field.suffix}
-                      </div>
+                      {field.id !== 'growthRate' && (
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-600 uppercase tracking-widest pointer-events-none">
+                          {data.currency}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
+            </section>
+          </div>
 
-              <div className="mt-12 p-4 rounded-2xl bg-teal-500/5 border border-teal-500/10">
-                <p className="text-[10px] text-teal-500/60 leading-relaxed font-medium">
-                  <span className="font-black mr-1">NOTE:</span>
-                  Les calculs sont mis à jour instantanément. Votre Health Score est une projection basée sur la rentabilité et le momentum.
+          <footer className="pt-10 border-t border-white/5 text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
+            <p>© 2026 UBB Digital</p>
+            <p className="mt-1 opacity-60">Building the Future of Africa</p>
+          </footer>
+        </aside>
+
+        {/* MAIN CONTENT: Dashboard */}
+        <main className="flex-1 lg:ml-[400px] p-8 lg:p-12 animate-in fade-in slide-in-from-right duration-1000">
+          <div className="max-w-5xl mx-auto space-y-12">
+            
+            {/* HERO SECTION: Score */}
+            <section className="flex flex-col items-center justify-center dashboard-card py-16 relative overflow-hidden">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent" />
+              <ScoreGauge 
+                score={result.totalScore} 
+                color={result.color} 
+                status={result.status} 
+              />
+              <div className="mt-10 text-center max-w-md px-6">
+                <h3 className="text-xl font-bold mb-2 tracking-tight">Analyse de Santé Business</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Basé sur votre rentabilité de <span className="text-white font-mono">{result.metrics.grossMargin.value}%</span> et votre croissance mensuelle.
                 </p>
               </div>
-            </div>
-          </aside>
+            </section>
 
-          {/* Visualization Column */}
-          <main className="xl:col-span-8 space-y-8 animate-in slide-in-from-bottom duration-1000 delay-200">
-            <div className="glass-panel p-10 rounded-3xl overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 blur-[80px] -z-10 rounded-full" />
-              
-              <div className="flex flex-col lg:flex-row items-center gap-16">
-                <div className="flex-shrink-0">
-                  <ScoreGauge 
-                    score={result.totalScore} 
-                    color={result.color} 
-                    status={result.status} 
-                  />
-                </div>
+            {/* METRICS GRID */}
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <MetricCard 
+                label="Marge Opérationnelle" 
+                value={result.metrics.grossMargin.value} 
+                unit="%" 
+                score={result.metrics.grossMargin.score} 
+                maxScore={40} 
+              />
+              <MetricCard 
+                label="Ratio Coûts" 
+                value={result.metrics.costRatio.value} 
+                unit="%" 
+                score={result.metrics.costRatio.score} 
+                maxScore={30} 
+              />
+              <MetricCard 
+                label="Growth Momentum" 
+                value={result.metrics.growthMomentum.value} 
+                unit="%" 
+                score={result.metrics.growthMomentum.score} 
+                maxScore={30} 
+              />
+            </section>
 
-                <div className="w-full grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-5">
-                  <MetricCard 
-                    label="Marge Opérationnelle" 
-                    value={result.metrics.grossMargin.value} 
-                    unit="%" 
-                    score={result.metrics.grossMargin.score} 
-                    maxScore={40} 
-                  />
-                  <MetricCard 
-                    label="Efficacité Coûts" 
-                    value={result.metrics.costRatio.value} 
-                    unit="%" 
-                    score={result.metrics.costRatio.score} 
-                    maxScore={30} 
-                  />
-                  <MetricCard 
-                    label="Momentum" 
-                    value={result.metrics.growthMomentum.value} 
-                    unit="%" 
-                    score={result.metrics.growthMomentum.score} 
-                    maxScore={30} 
-                  />
-                </div>
-              </div>
-
-              <div className="mt-12 pt-10 border-t border-white/5">
-                <InsightList insights={result.insights} />
-              </div>
-            </div>
-          </main>
-        </div>
-
-        <footer className="mt-20 flex justify-center text-gray-600 text-[9px] font-black uppercase tracking-[0.4em] opacity-40">
-          © 2026 UBB Digital - Building the Future of Africa
-        </footer>
+            {/* INSIGHTS SECTION */}
+            <section className="dashboard-card p-10">
+              <InsightList insights={result.insights} />
+            </section>
+          </div>
+        </main>
       </div>
     </div>
   );

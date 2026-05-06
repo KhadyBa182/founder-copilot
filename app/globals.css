@@ -5,65 +5,54 @@
 @import "tailwindcss";
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 8, 8, 12;
+  --teal-primary: 20, 184, 166;
+  --bg-dark: 3, 3, 5;
+  --card-bg: 10, 10, 15;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  background-color: rgb(var(--bg-dark));
+  color: #fff;
+  font-family: var(--font-geist-sans), Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-.glass-panel {
-  background: rgba(20, 20, 25, 0.6);
-  backdrop-filter: blur(12px);
+.dashboard-card {
+  background: rgba(15, 15, 20, 0.7);
+  backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 24px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.glass-input {
-  background: rgba(30, 30, 40, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.dashboard-card:hover {
+  border-color: rgba(var(--teal-primary), 0.3);
+  transform: translateY(-2px);
 }
 
-.glass-input:focus {
-  background: rgba(40, 40, 55, 0.6);
-  border-color: rgba(20, 184, 166, 0.5);
-  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+.input-field {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  transition: all 0.3s ease;
 }
 
-.text-glow {
-  text-shadow: 0 0 15px currentColor;
+.input-field:focus-within {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgb(var(--teal-primary));
+  box-shadow: 0 0 0 4px rgba(var(--teal-primary), 0.1);
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+.stat-value {
+  font-feature-settings: "tnum" on, "lnum" on;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+@keyframes slow-glow {
+  0%, 100% { opacity: 0.5; filter: blur(80px); }
+  50% { opacity: 0.8; filter: blur(120px); }
 }
 
-.gradient-border {
-  position: relative;
-}
-
-.gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02), rgba(20, 184, 166, 0.3));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+.glow-bg {
+  animation: slow-glow 8s ease-in-out infinite;
 }

@@ -15,39 +15,46 @@ const MetricCard: React.FC<MetricCardProps> = ({ label, value, unit, score, maxS
   return (
     <div 
       suppressHydrationWarning
-      className="glass-panel p-5 rounded-2xl flex flex-col justify-between group transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.03] gradient-border"
+      className="dashboard-card p-6 flex flex-col justify-between group h-full"
     >
-      <div className="flex justify-between items-start mb-4">
-        <span className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.15em] opacity-80 group-hover:opacity-100 transition-opacity">
-          {label}
-        </span>
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex flex-col gap-1">
+          <span className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">
+            {label}
+          </span>
+          <div className="h-0.5 w-6 bg-teal-500/30 rounded-full" />
+        </div>
         <div 
-          className="w-2 h-2 rounded-full animate-pulse-slow"
-          style={{ backgroundColor: statusColor, boxShadow: `0 0 10px ${statusColor}` }}
-        />
+          className="px-2 py-1 rounded-md text-[9px] font-black tracking-tighter"
+          style={{ backgroundColor: `${statusColor}15`, color: statusColor, border: `1px solid ${statusColor}33` }}
+        >
+          {score}/{maxScore} PTS
+        </div>
       </div>
 
-      <div className="flex items-baseline gap-2 mb-6">
-        <span className="text-3xl font-mono font-bold text-white tracking-tight">
+      <div className="flex items-baseline gap-1 mb-6">
+        <span className="text-4xl font-mono font-bold text-white stat-value tracking-tighter">
           {value > 1000 ? value.toLocaleString() : value}
         </span>
-        <span className="text-gray-500 text-xs font-mono font-medium opacity-50 uppercase">{unit}</span>
+        <span className="text-gray-500 text-sm font-bold uppercase tracking-widest opacity-40">{unit}</span>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500">
-          <span>Performance</span>
-          <span style={{ color: statusColor }}>{Math.round(ratio * 100)}%</span>
+      <div className="relative pt-4">
+        <div className="flex justify-between items-center mb-2 text-[10px] font-bold text-gray-500">
+          <span className="uppercase tracking-widest opacity-60">Indice de Santé</span>
+          <span className="font-mono text-white/80">{Math.round(ratio * 100)}%</span>
         </div>
-        <div className="bg-white/[0.03] h-1.5 rounded-full overflow-hidden border border-white/[0.05]">
+        <div className="h-1.5 w-full bg-white/[0.03] rounded-full overflow-hidden border border-white/[0.05]">
           <div 
-            className="h-full transition-all duration-1000 ease-out"
+            className="h-full transition-all duration-1000 ease-out relative"
             style={{ 
               width: `${(score / maxScore) * 100}%`,
               backgroundColor: statusColor,
-              boxShadow: `0 0 12px ${statusColor}66`
+              boxShadow: `0 0 15px ${statusColor}44`
             }}
-          />
+          >
+            <div className="absolute top-0 right-0 h-full w-4 bg-white/20 blur-[2px]" />
+          </div>
         </div>
       </div>
     </div>
