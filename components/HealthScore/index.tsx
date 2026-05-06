@@ -1,151 +1,385 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useHealthScore } from '../../hooks/useHealthScore';
 import ScoreGauge from './ScoreGauge';
 import MetricCard from './MetricCard';
 import InsightList from './InsightList';
 
+// ─── Field config ────────────────────────────────────────────────────────────
+const FIELDS = [
+  { id: 'monthlyRevenue', label: "Chiffre d'affaires",  suffix: 'currency', placeholder: '0' },
+  { id: 'monthlyCosts',   label: 'Charges totales',     suffix: 'currency', placeholder: '0' },
+  { id: 'growthRate',     label: 'Taux de croissance',  suffix: '%',        placeholder: '0' },
+] as const;
+
+// ─── Tier helper (mirrors scoring.ts, display-only) ──────────────────────────
+function tierColor(score: number) {
+  if (score >= 80) return '#4ade80';
+  if (score >= 60) return '#2dd4bf';
+  if (score >= 40) return '#fb923c';
+  return '#f87171';
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 const BusinessHealthScore: React.FC = () => {
   const { data, result, updateField, setCurrency } = useHealthScore();
+  const [activeTab, setActiveTab] = useState<'metrics' | 'insights'>('metrics');
+  const accent = tierColor(result.totalScore);
 
   return (
-    <div className="min-h-screen bg-[#030305] text-white selection:bg-teal-500/30 overflow-x-hidden font-sans">
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-teal-500/[0.03] blur-[150px] rounded-full glow-bg" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/[0.03] blur-[150px] rounded-full glow-bg" style={{ animationDelay: '2s' }} />
+    <div
+      suppressHydrationWarning
+      style={{
+        fontFamily: "'DM Mono', 'IBM Plex Mono', monospace",
+        minHeight: '100vh',
+        background: '#080809',
+        color: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowX: 'hidden',
+      }}
+    >
+      {/* ── Ambient background blobs ── */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', top: '-15%', right: '-8%',
+          width: '55%', height: '55%', borderRadius: '50%',
+          background: `radial-gradient(circle, ${accent}08 0%, transparent 70%)`,
+          transition: 'background 1.2s ease',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '-18%', left: '-8%',
+          width: '45%', height: '45%', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(45,212,191,0.04) 0%, transparent 70%)',
+        }} />
+        {/* Grid texture */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }} />
       </div>
 
-      <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row min-h-screen">
-        
-        {/* SIDEBAR: Configuration */}
-        <aside className="w-full lg:w-[400px] lg:fixed lg:h-screen p-8 border-b lg:border-b-0 lg:border-r border-white/5 bg-black/20 backdrop-blur-3xl z-10 flex flex-col">
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
-                <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+      {/* ── Layout wrapper ── */}
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh', maxWidth: '1440px', margin: '0 auto', width: '100%' }}>
+
+        {/* ════════════════════════════════════════════════
+            SIDEBAR
+        ════════════════════════════════════════════════ */}
+        <aside style={{
+          width: '360px', flexShrink: 0,
+          borderRight: '1px solid rgba(255,255,255,0.05)',
+          background: 'rgba(10,10,12,0.7)',
+          backdropFilter: 'blur(24px)',
+          display: 'flex', flexDirection: 'column',
+          padding: '2rem 1.75rem',
+          position: 'sticky', top: 0, height: '100vh',
+          overflowY: 'auto',
+        }}>
+
+          {/* Logo block */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+              <div style={{
+                width: '32px', height: '32px', borderRadius: '8px',
+                background: accent,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.6s ease',
+                boxShadow: `0 0 18px ${accent}40`,
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#000">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <h1 className="text-xl font-black uppercase tracking-tighter">
-                Founder <span className="text-teal-500">Copilot</span>
-              </h1>
-            </div>
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] opacity-60">Intelligence Business App</p>
-          </div>
-
-          <div className="flex-1 space-y-10">
-            <section className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-500">Paramètres</h2>
-                <div className="flex bg-white/5 p-1 rounded-lg">
-                  {(['XOF', 'USD'] as const).map((curr) => (
-                    <button
-                      key={curr}
-                      onClick={() => setCurrency(curr)}
-                      className={`px-4 py-1.5 rounded-md text-[9px] font-black transition-all tracking-widest ${
-                        data.currency === curr 
-                        ? 'bg-teal-500 text-black' 
-                        : 'text-gray-500 hover:text-white'
-                      }`}
-                    >
-                      {curr}
-                    </button>
-                  ))}
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                  Founder <span style={{ color: accent, transition: 'color 0.6s ease' }}>Copilot</span>
+                </div>
+                <div style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.25)', marginTop: '3px', textTransform: 'uppercase' }}>
+                  UBB Digital · v1.0
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div className="space-y-6">
+          {/* Section title */}
+          <div style={{
+            fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
+            color: accent, marginBottom: '1.25rem', fontWeight: 500,
+            transition: 'color 0.6s ease',
+          }}>
+            Paramètres business
+          </div>
+
+          {/* Currency toggle */}
+          <div style={{ marginBottom: '1.75rem' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>
+              Devise
+            </div>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '3px', gap: '2px' }}>
+              {(['XOF', 'USD'] as const).map(curr => (
+                <button
+                  key={curr}
+                  onClick={() => setCurrency(curr)}
+                  style={{
+                    flex: 1, padding: '7px 0', border: 'none', borderRadius: '6px',
+                    fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em',
+                    cursor: 'pointer', transition: 'all 0.2s ease',
+                    background: data.currency === curr ? accent : 'transparent',
+                    color: data.currency === curr ? '#000' : 'rgba(255,255,255,0.4)',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {curr}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Input fields */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', flex: 1 }}>
+            {FIELDS.map((field) => {
+              const val = (data as any)[field.id];
+              const isFilled = val && val !== '0' && val !== '';
+              return (
+                <div key={field.id}>
+                  <label
+                    htmlFor={field.id}
+                    style={{
+                      display: 'block', fontSize: '10px', letterSpacing: '0.14em',
+                      textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)',
+                      marginBottom: '7px', fontWeight: 500,
+                    }}
+                  >
+                    {field.label}
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id={field.id}
+                      type="number"
+                      placeholder={field.placeholder}
+                      value={val || ''}
+                      onChange={(e) => updateField(field.id as any, e.target.value)}
+                      style={{
+                        width: '100%', background: isFilled ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.025)',
+                        border: `1px solid ${isFilled ? `${accent}40` : 'rgba(255,255,255,0.06)'}`,
+                        borderRadius: '10px', padding: '12px 16px',
+                        paddingRight: field.suffix === 'currency' ? '56px' : '36px',
+                        fontSize: '18px', fontWeight: 500, color: '#fff',
+                        outline: 'none', fontFamily: 'inherit',
+                        letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
+                        transition: 'border-color 0.2s ease, background 0.2s ease',
+                        boxSizing: 'border-box',
+                        MozAppearance: 'textfield',
+                      } as React.CSSProperties}
+                      onFocus={e => { e.currentTarget.style.borderColor = `${accent}70`; e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = isFilled ? `${accent}40` : 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = isFilled ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.025)'; }}
+                    />
+                    <span style={{
+                      position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
+                      fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                      color: 'rgba(255,255,255,0.2)', pointerEvents: 'none',
+                    }}>
+                      {field.suffix === 'currency' ? data.currency : field.suffix}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Footer */}
+          <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '1.75rem' }}>
+            <div style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)', lineHeight: 1.8 }}>
+              <div>© 2026 UBB Digital</div>
+              <div style={{ opacity: 0.6 }}>Building the Future of Africa</div>
+            </div>
+          </div>
+        </aside>
+
+        {/* ════════════════════════════════════════════════
+            MAIN CONTENT
+        ════════════════════════════════════════════════ */}
+        <main style={{ flex: 1, padding: '2.5rem 2.75rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+          {/* ── Top bar ── */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '4px' }}>
+                Tableau de bord
+              </div>
+              <h1 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>
+                Santé Business
+              </h1>
+            </div>
+            {/* Live status pill */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '7px',
+              padding: '7px 14px', borderRadius: '100px',
+              border: `1px solid ${accent}30`,
+              background: `${accent}0A`,
+              transition: 'all 0.5s ease',
+            }}>
+              <span style={{
+                width: '6px', height: '6px', borderRadius: '50%',
+                background: accent, display: 'inline-block',
+                boxShadow: `0 0 8px ${accent}`,
+                animation: 'pulse 2s ease-out infinite',
+              }} />
+              <span style={{ fontSize: '10px', letterSpacing: '0.16em', textTransform: 'uppercase', color: accent, fontWeight: 500, transition: 'color 0.5s ease' }}>
+                {result.status}
+              </span>
+            </div>
+          </div>
+
+          {/* ── Hero: gauge + score summary ── */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'auto 1fr',
+            gap: '2rem', alignItems: 'center',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: '20px', padding: '2.5rem',
+            position: 'relative', overflow: 'hidden',
+          }}>
+            {/* top accent line */}
+            <div style={{
+              position: 'absolute', top: 0, left: '15%', right: '15%', height: '1px',
+              background: `linear-gradient(to right, transparent, ${accent}50, transparent)`,
+              transition: 'background 0.8s ease',
+            }} />
+
+            <ScoreGauge score={result.totalScore} color={accent} status={result.status} />
+
+            {/* Right side summary */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '6px' }}>
+                  Analyse
+                </div>
+                <p style={{ fontSize: '14px', lineHeight: 1.7, color: 'rgba(255,255,255,0.6)', maxWidth: '380px' }}>
+                  Marge brute de{' '}
+                  <span style={{ color: '#fff', fontWeight: 500 }}>{result.metrics.grossMargin.value}%</span>
+                  {' '}avec une croissance mensuelle de{' '}
+                  <span style={{ color: accent, fontWeight: 500, transition: 'color 0.5s ease' }}>
+                    +{result.metrics.growthMomentum.value}%
+                  </span>
+                  .
+                </p>
+              </div>
+
+              {/* Mini stat row */}
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 {[
-                  { id: 'monthlyRevenue', label: 'Chiffre d\'Affaires Mensuel', icon: '💰' },
-                  { id: 'monthlyCosts', label: 'Charges Totales', icon: '📉' },
-                  { id: 'growthRate', label: 'Taux de Croissance (%)', icon: '🚀' },
-                ].map((field) => (
-                  <div key={field.id} className="space-y-3 group">
-                    <label htmlFor={field.id} className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest transition-colors group-focus-within:text-teal-500">
-                      <span>{field.icon}</span>
-                      {field.label}
-                    </label>
-                    <div className="input-field relative overflow-hidden">
-                      <input
-                        id={field.id}
-                        type="number"
-                        className="w-full bg-transparent py-4 px-5 font-mono text-xl text-white focus:outline-none placeholder:text-white/10"
-                        placeholder="0.00"
-                        value={(data as any)[field.id] || ''}
-                        onChange={(e) => updateField(field.id as any, e.target.value)}
-                      />
-                      {field.id !== 'growthRate' && (
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-600 uppercase tracking-widest pointer-events-none">
-                          {data.currency}
-                        </div>
-                      )}
+                  { label: 'Marge',      val: `${result.metrics.grossMargin.value}%`,    pts: `${result.metrics.grossMargin.score}/40`    },
+                  { label: 'Coûts',      val: `${result.metrics.costRatio.value}%`,      pts: `${result.metrics.costRatio.score}/30`      },
+                  { label: 'Croissance', val: `${result.metrics.growthMomentum.value}%`, pts: `${result.metrics.growthMomentum.score}/30` },
+                ].map(item => (
+                  <div key={item.label} style={{
+                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+                    borderRadius: '12px', padding: '12px 16px', minWidth: '100px',
+                  }}>
+                    <div style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '5px' }}>
+                      {item.label}
+                    </div>
+                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                      {item.val}
+                    </div>
+                    <div style={{ fontSize: '10px', color: accent, marginTop: '4px', letterSpacing: '0.06em', transition: 'color 0.5s ease' }}>
+                      {item.pts} pts
                     </div>
                   </div>
                 ))}
               </div>
-            </section>
+            </div>
           </div>
 
-          <footer className="pt-10 border-t border-white/5 text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
-            <p>© 2026 UBB Digital</p>
-            <p className="mt-1 opacity-60">Building the Future of Africa</p>
-          </footer>
-        </aside>
+          {/* ── Tab bar ── */}
+          <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '4px', alignSelf: 'flex-start' }}>
+            {([['metrics', 'Métriques'], ['insights', 'Insights']] as const).map(([id, lbl]) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                style={{
+                  padding: '8px 20px', border: 'none', borderRadius: '7px', cursor: 'pointer',
+                  fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em',
+                  fontFamily: 'inherit', transition: 'all 0.2s ease',
+                  background: activeTab === id ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  color: activeTab === id ? '#fff' : 'rgba(255,255,255,0.35)',
+                }}
+              >
+                {lbl}
+              </button>
+            ))}
+          </div>
 
-        {/* MAIN CONTENT: Dashboard */}
-        <main className="flex-1 lg:ml-[400px] p-8 lg:p-12 animate-in fade-in slide-in-from-right duration-1000">
-          <div className="max-w-5xl mx-auto space-y-12">
-            
-            {/* HERO SECTION: Score */}
-            <section className="flex flex-col items-center justify-center dashboard-card py-16 relative overflow-hidden">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-teal-500/50 to-transparent" />
-              <ScoreGauge 
-                score={result.totalScore} 
-                color={result.color} 
-                status={result.status} 
-              />
-              <div className="mt-10 text-center max-w-md px-6">
-                <h3 className="text-xl font-bold mb-2 tracking-tight">Analyse de Santé Business</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  Basé sur votre rentabilité de <span className="text-white font-mono">{result.metrics.grossMargin.value}%</span> et votre croissance mensuelle.
-                </p>
-              </div>
-            </section>
+          {/* ── Metrics grid ── */}
+          {activeTab === 'metrics' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+              <MetricCard label="Marge opérationnelle" value={result.metrics.grossMargin.value}    unit="%"  score={result.metrics.grossMargin.score}    maxScore={40} />
+              <MetricCard label="Ratio coûts"          value={result.metrics.costRatio.value}      unit="%"  score={result.metrics.costRatio.score}      maxScore={30} />
+              <MetricCard label="Growth momentum"      value={result.metrics.growthMomentum.value} unit="%" score={result.metrics.growthMomentum.score} maxScore={30} />
+            </div>
+          )}
 
-            {/* METRICS GRID */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <MetricCard 
-                label="Marge Opérationnelle" 
-                value={result.metrics.grossMargin.value} 
-                unit="%" 
-                score={result.metrics.grossMargin.score} 
-                maxScore={40} 
-              />
-              <MetricCard 
-                label="Ratio Coûts" 
-                value={result.metrics.costRatio.value} 
-                unit="%" 
-                score={result.metrics.costRatio.score} 
-                maxScore={30} 
-              />
-              <MetricCard 
-                label="Growth Momentum" 
-                value={result.metrics.growthMomentum.value} 
-                unit="%" 
-                score={result.metrics.growthMomentum.score} 
-                maxScore={30} 
-              />
-            </section>
-
-            {/* INSIGHTS SECTION */}
-            <section className="dashboard-card p-10">
+          {/* ── Insights ── */}
+          {activeTab === 'insights' && (
+            <div style={{
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: '20px', padding: '2rem',
+            }}>
               <InsightList insights={result.insights} />
-            </section>
+            </div>
+          )}
+
+          {/* ── Score progress bar (bottom) ── */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '14px', padding: '1.25rem 1.5rem',
+            display: 'flex', alignItems: 'center', gap: '1.25rem',
+          }}>
+            <div style={{ fontSize: '10px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+              Score global
+            </div>
+            <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'visible', position: 'relative' }}>
+              <div style={{
+                height: '100%', width: `${result.totalScore}%`,
+                background: accent, borderRadius: '2px',
+                transition: 'width 1.4s cubic-bezier(0.16,1,0.3,1), background 0.6s ease',
+                position: 'relative',
+              }}>
+                <div style={{
+                  position: 'absolute', right: '-1px', top: '-4px',
+                  width: '10px', height: '10px', borderRadius: '50%',
+                  background: accent, boxShadow: `0 0 10px 2px ${accent}70`,
+                  transition: 'background 0.6s ease, box-shadow 0.6s ease',
+                }} />
+              </div>
+            </div>
+            <div style={{ fontSize: '18px', fontWeight: 700, color: accent, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums', minWidth: '52px', textAlign: 'right', transition: 'color 0.6s ease' }}>
+              {result.totalScore}<span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', fontWeight: 400 }}>/100</span>
+            </div>
           </div>
+
         </main>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+        input[type=number] { -moz-appearance: textfield; }
+        @keyframes pulse {
+          0%   { box-shadow: 0 0 0 0 currentColor; }
+          70%  { box-shadow: 0 0 0 6px transparent; }
+          100% { box-shadow: 0 0 0 0 transparent; }
+        }
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+      `}</style>
     </div>
   );
 };
