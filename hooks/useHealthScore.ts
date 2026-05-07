@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
-import { BusinessData, HealthScoreResult } from '../types/health';
+import { BusinessData } from '../types/health';
 import { computeHealthScore } from '../lib/scoring';
 
 /**
  * Hook personnalisé pour gérer l'état des entrées et le calcul du score de santé.
- * 
- * @returns State et fonctions pour interagir avec le module de santé business.
  */
 export function useHealthScore() {
   const [data, setData] = useState<BusinessData>({
@@ -35,6 +33,9 @@ export function useHealthScore() {
     }));
   };
 
+  /**
+   * Change la devise (XOF/USD)
+   */
   const setCurrency = (currency: 'XOF' | 'USD') => {
     setData((prev) => ({ ...prev, currency }));
   };
