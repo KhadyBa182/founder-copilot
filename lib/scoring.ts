@@ -38,7 +38,22 @@ export function computeHealthScore(
   costs: number,
   growth: number
 ): HealthScoreResult {
-  // Protection contre division par zéro et valeurs aberrantes
+  // 0. Si aucun revenu n'est saisi, le score est 0
+  if (revenue <= 0) {
+    return {
+      totalScore: 0,
+      status: 'Critique',
+      color: '#f87171',
+      metrics: {
+        grossMargin: { value: 0, score: 0, label: 'Marge Brute', unit: '%' },
+        costRatio: { value: 0, score: 0, label: 'Ratio Coût', unit: '%' },
+        growthMomentum: { value: 0, score: 0, label: 'Momentum Croissance', unit: '%' },
+      },
+      insights: ["Veuillez entrer vos données financières pour obtenir une analyse."],
+    };
+  }
+
+  // Protection contre division par zéro
   const safeRevenue = revenue <= 0 ? 0.000001 : revenue;
   
   // 1. Calcul Marge Brute

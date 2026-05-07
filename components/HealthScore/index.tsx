@@ -8,9 +8,9 @@ import InsightList from './InsightList';
 
 // ─── Field config ────────────────────────────────────────────────────────────
 const FIELDS = [
-  { id: 'monthlyRevenue', label: "Chiffre d'affaires",  suffix: 'currency', placeholder: '0' },
-  { id: 'monthlyCosts',   label: 'Charges totales',     suffix: 'currency', placeholder: '0' },
-  { id: 'growthRate',     label: 'Taux de croissance',  suffix: '%',        placeholder: '0' },
+  { id: 'monthlyRevenue', label: "Revenue",    suffix: 'currency', placeholder: '1 000 000' },
+  { id: 'monthlyCosts',   label: 'Cout',       suffix: 'currency', placeholder: '600 000' },
+  { id: 'growthRate',     label: 'Croissance', suffix: '%',        placeholder: '15' },
 ] as const;
 
 // ─── Tier helper (mirrors scoring.ts, display-only) ──────────────────────────
@@ -64,129 +64,76 @@ const BusinessHealthScore: React.FC = () => {
       {/* ── Layout wrapper ── */}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh', maxWidth: '1440px', margin: '0 auto', width: '100%' }}>
 
-        {/* ════════════════════════════════════════════════
-            SIDEBAR
-        ════════════════════════════════════════════════ */}
+        {/* SIDEBAR: Configuration */}
         <aside style={{
-          width: '360px', flexShrink: 0,
+          width: '300px', flexShrink: 0,
           borderRight: '1px solid rgba(255,255,255,0.05)',
           background: 'rgba(10,10,12,0.7)',
           backdropFilter: 'blur(24px)',
           display: 'flex', flexDirection: 'column',
-          padding: '2rem 1.75rem',
+          padding: '1.5rem 1.25rem',
           position: 'sticky', top: 0, height: '100vh',
           overflowY: 'auto',
         }}>
 
           {/* Logo block */}
-          <div style={{ marginBottom: '2.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
               <div style={{
-                width: '32px', height: '32px', borderRadius: '8px',
+                width: '28px', height: '28px', borderRadius: '6px',
                 background: accent,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'background 0.6s ease',
-                boxShadow: `0 0 18px ${accent}40`,
+                boxShadow: `0 0 15px ${accent}40`,
               }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#000">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#000">
                   <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <div>
-                <div style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
-                  Founder <span style={{ color: accent, transition: 'color 0.6s ease' }}>Copilot</span>
-                </div>
-                <div style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.25)', marginTop: '3px', textTransform: 'uppercase' }}>
-                  UBB Digital · v1.0
-                </div>
+              <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                Founder <span style={{ color: accent }}>Copilot</span>
               </div>
-            </div>
-          </div>
-
-          {/* Section title */}
-          <div style={{
-            fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: accent, marginBottom: '1.25rem', fontWeight: 500,
-            transition: 'color 0.6s ease',
-          }}>
-            Paramètres business
-          </div>
-
-          {/* Currency toggle */}
-          <div style={{ marginBottom: '1.75rem' }}>
-            <div style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>
-              Devise
-            </div>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '3px', gap: '2px' }}>
-              {(['XOF', 'USD'] as const).map(curr => (
-                <button
-                  key={curr}
-                  onClick={() => setCurrency(curr)}
-                  style={{
-                    flex: 1, padding: '7px 0', border: 'none', borderRadius: '6px',
-                    fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em',
-                    cursor: 'pointer', transition: 'all 0.2s ease',
-                    background: data.currency === curr ? accent : 'transparent',
-                    color: data.currency === curr ? '#000' : 'rgba(255,255,255,0.4)',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  {curr}
-                </button>
-              ))}
             </div>
           </div>
 
           {/* Input fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', flex: 1 }}>
-            {FIELDS.map((field) => {
-              const val = (data as any)[field.id];
-              const isFilled = val && val !== '0' && val !== '';
-              return (
-                <div key={field.id}>
-                  <label
-                    htmlFor={field.id}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
+            {FIELDS.map((field) => (
+              <div key={field.id}>
+                <label
+                  htmlFor={field.id}
+                  style={{
+                    display: 'block', fontSize: '9px', letterSpacing: '0.12em',
+                    textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)',
+                    marginBottom: '5px', fontWeight: 500,
+                  }}
+                >
+                  {field.label}
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id={field.id}
+                    type="number"
+                    placeholder={field.placeholder}
+                    value={(data as any)[field.id] || ''}
+                    onChange={(e) => updateField(field.id as any, e.target.value)}
                     style={{
-                      display: 'block', fontSize: '10px', letterSpacing: '0.14em',
-                      textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)',
-                      marginBottom: '7px', fontWeight: 500,
+                      width: '100%', background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: '8px', padding: '10px 12px',
+                      fontSize: '15px', fontWeight: 500, color: '#fff',
+                      outline: 'none', fontFamily: 'inherit',
+                      boxSizing: 'border-box',
                     }}
-                  >
-                    {field.label}
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      id={field.id}
-                      type="number"
-                      placeholder={field.placeholder}
-                      value={val || ''}
-                      onChange={(e) => updateField(field.id as any, e.target.value)}
-                      style={{
-                        width: '100%', background: isFilled ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.025)',
-                        border: `1px solid ${isFilled ? `${accent}40` : 'rgba(255,255,255,0.06)'}`,
-                        borderRadius: '10px', padding: '12px 16px',
-                        paddingRight: field.suffix === 'currency' ? '56px' : '36px',
-                        fontSize: '18px', fontWeight: 500, color: '#fff',
-                        outline: 'none', fontFamily: 'inherit',
-                        letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
-                        transition: 'border-color 0.2s ease, background 0.2s ease',
-                        boxSizing: 'border-box',
-                        MozAppearance: 'textfield',
-                      } as React.CSSProperties}
-                      onFocus={e => { e.currentTarget.style.borderColor = `${accent}70`; e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
-                      onBlur={e => { e.currentTarget.style.borderColor = isFilled ? `${accent}40` : 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = isFilled ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.025)'; }}
-                    />
-                    <span style={{
-                      position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
-                      fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase',
-                      color: 'rgba(255,255,255,0.2)', pointerEvents: 'none',
-                    }}>
-                      {field.suffix === 'currency' ? data.currency : field.suffix}
-                    </span>
-                  </div>
+                  />
+                  <span style={{
+                    position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                    fontSize: '9px', color: 'rgba(255,255,255,0.2)', pointerEvents: 'none',
+                  }}>
+                    {field.suffix === 'currency' ? data.currency : field.suffix}
+                  </span>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
           {/* Footer */}
