@@ -79,19 +79,34 @@ const BusinessHealthScore: React.FC = () => {
           {/* Logo block */}
           <div style={{ marginBottom: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <div style={{
-                width: '28px', height: '28px', borderRadius: '6px',
-                background: accent,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: `0 0 15px ${accent}40`,
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#000">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              </div>
               <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
                 Founder <span style={{ color: accent }}>Copilot</span>
               </div>
+            </div>
+          </div>
+
+          {/* Currency toggle */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', marginBottom: '8px', fontWeight: 500 }}>
+              Devise
+            </div>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '3px', gap: '2px' }}>
+              {(['XOF', 'USD'] as const).map(curr => (
+                <button
+                  key={curr}
+                  onClick={() => setCurrency(curr)}
+                  style={{
+                    flex: 1, padding: '6px 0', border: 'none', borderRadius: '6px',
+                    fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em',
+                    cursor: 'pointer', transition: 'all 0.2s ease',
+                    background: data.currency === curr ? accent : 'transparent',
+                    color: data.currency === curr ? '#000' : 'rgba(255,255,255,0.4)',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {curr}
+                </button>
+              ))}
             </div>
           </div>
 
