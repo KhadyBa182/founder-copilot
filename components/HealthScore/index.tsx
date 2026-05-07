@@ -79,7 +79,7 @@ const BusinessHealthScore: React.FC = () => {
           {/* Logo block */}
           <div style={{ marginBottom: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
                 Founder <span style={{ color: accent }}>Copilot</span>
               </div>
             </div>
